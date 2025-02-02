@@ -8,7 +8,10 @@
 cp terraform.example.tfvars terraform.tfvars
 ```
 
-### Update the `ami_id`in the `terraform.tfvars`
+### Update the following in `terraform.tfvars`
+- ami_id
+- db_username
+- db_password
 
 ### Create a public key 
 ```shell
