@@ -22,8 +22,8 @@ resource "aws_subnet" "subnet_1" {
 }
 
 resource "aws_subnet" "subnet_2" {
-  vpc_id     = aws_vpc.core_bank_vpc.id
-  cidr_block = "10.10.16.0/20"
+  vpc_id                  = aws_vpc.core_bank_vpc.id
+  cidr_block              = "10.10.16.0/20"
   availability_zone       = "us-east-1b"
   tags = {
     Name = "subnet-2"
@@ -60,6 +60,8 @@ resource "aws_route_table_association" "private_assoc" {
 
 # Security Group
 resource "aws_security_group" "core_bank_sg" {
+  name = "core-bank-sg"
+  description = "Security group for Core Bank infrastructure"
   vpc_id = aws_vpc.core_bank_vpc.id
 
   ingress {
@@ -101,9 +103,9 @@ resource "aws_key_pair" "core_bank_key" {
 
 # EC2 Instances
 resource "aws_instance" "core_bank_vm" {
-  count         = 25
+  count         = 3
   ami           = var.ami_id
-  instance_type = "t2.micro"
+  instance_type = "t3.medium"
   key_name      = aws_key_pair.core_bank_key.key_name
   subnet_id     = aws_subnet.subnet_1.id
   security_groups = [aws_security_group.core_bank_sg.id]
@@ -112,16 +114,23 @@ resource "aws_instance" "core_bank_vm" {
   }
 }
 
+# RDS Subnet Group (Ensure RDS is in the Same VPC & Subnet)
+resource "aws_db_subnet_group" "core_bank_db_subnet_group" {
+  name       = "core-bank-db-subnet-group"
+  subnet_ids = [aws_subnet.subnet_1.id, aws_subnet.subnet_2.id]
+}
+
 # RDS Database
 resource "aws_db_instance" "core_bank_rds" {
   allocated_storage    = 50
   storage_type         = "gp2"
   engine               = "mysql"
   instance_class       = "db.t3.medium"
-  username             = "admin"
-  password             = "securepassword"
+  username             = var.db_username
+  password             = var.db_password
   publicly_accessible  = false
   vpc_security_group_ids = [aws_security_group.core_bank_sg.id]
+  db_subnet_group_name   = aws_db_subnet_group.core_bank_db_subnet_group.name
   skip_final_snapshot  = true
 }
 
@@ -133,11 +142,12 @@ resource "aws_ebs_volume" "core_bank_ebs" {
 
 # Elastic Cache (Redis)
 resource "aws_elasticache_cluster" "core_bank_cache" {
-  cluster_id          = "core-bank-cache"
-  engine              = "redis"
-  node_type           = "cache.t3.micro"
-  num_cache_nodes     = 1
-  parameter_group_name = "default.redis6.x"
+  cluster_id           = "core-bank-cache"
+  engine               = "redis"
+  engine_version       = "7.0"
+  node_type            = "cache.t3.micro"
+  num_cache_nodes      = 1
+  parameter_group_name = "default.redis7"
 }
 
 # Route 53

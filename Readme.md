@@ -3,9 +3,16 @@
 
 ## Requirements
 
+### Make a copy pf the `.tfvars` file 
+```shell
+cp terraform.example.tfvars terraform.tfvars
+```
+
+### Update the `ami_id`in the `terraform.tfvars`
+
 ### Create a public key 
 ```shell
-ssh-keygen -t rsa -b 4096 -f ~/.ssh/corebank-key
+ssh-keygen -t rsa -b 4096 -f ~/.ssh/core-bank-key
 ```
 
 ### AWS Environment Variables
