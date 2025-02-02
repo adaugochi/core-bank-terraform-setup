@@ -110,7 +110,7 @@ resource "aws_instance" "core_bank_vm" {
   subnet_id     = aws_subnet.subnet_1.id
   security_groups = [aws_security_group.core_bank_sg.id]
   tags = {
-    Name = "core-bank-vm-${count.index}"
+    Name = "core-bank-vm-${count.index + 1}"
   }
 }
 
@@ -122,16 +122,17 @@ resource "aws_db_subnet_group" "core_bank_db_subnet_group" {
 
 # RDS Database
 resource "aws_db_instance" "core_bank_rds" {
-  allocated_storage    = 50
-  storage_type         = "gp2"
-  engine               = "mysql"
-  instance_class       = "db.t3.medium"
-  username             = var.db_username
-  password             = var.db_password
-  publicly_accessible  = false
+  identifier             = "core-bank-db"
+  allocated_storage      = 50
+  storage_type           = "gp2"
+  engine                 = "mysql"
+  instance_class         = "db.t3.medium"
+  username               = var.db_username
+  password               = var.db_password
+  publicly_accessible    = false
   vpc_security_group_ids = [aws_security_group.core_bank_sg.id]
   db_subnet_group_name   = aws_db_subnet_group.core_bank_db_subnet_group.name
-  skip_final_snapshot  = true
+  skip_final_snapshot    = true
 }
 
 # Block Storage
