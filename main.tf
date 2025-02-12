@@ -103,7 +103,7 @@ resource "aws_key_pair" "core_bank_key" {
 
 # EC2 Instances
 resource "aws_instance" "core_bank_vm" {
-  count         = 2
+  count         = 3
   ami           = var.ami_id
   instance_type = "t3.medium"
   key_name      = aws_key_pair.core_bank_key.key_name
