@@ -5,6 +5,7 @@
 
 ### Install Terraform
 
+
 ### Make a copy pf the `.tfvars` file 
 ```shell
 cp terraform.example.tfvars terraform.tfvars
